@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>doing by ttscoff</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>doing</h1>
+        <h2>A command line tool for remembering what you were doing and tracking what you&#39;ve done.</h2>
+        <a href="https://github.com/ttscoff/doing" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <p><em>If you're one of the rare people like me who find this useful, feel free to contribute to my <a href="https://www.gittip.com/ttscoff/">GitTip fund</a> or just <a href="http://brettterpstra.com/donate">buy me some coffee</a>.</em></p>
+
+<h2>
+<a name="what-and-why" class="anchor" href="#what-and-why"><span class="octicon octicon-link"></span></a>What and why</h2>
+
+<p><code>doing</code> is a basic CLI for adding and listing "what was I doing" reminders in a <a href="http://www.hogbaysoftware.com/products/taskpaper">TaskPaper-formatted</a> text file. It allows for multiple sections/categories and flexible output formatting.</p>
+
+<p>While I'm working, I have hourly reminders to record what I'm working on, and I try to remember to punch in quick notes if I'm unexpectedly called away from a project. I can do this just by typing <code>doing now tracking down the CG bug</code>. </p>
+
+<p>If there's something I want to look at later but doesn't need to be added to a task list or tracker, I can type <code>doing later check out the pinboard bookmarks from macdrifter</code>. When I get back to my computer --- or just need a refresher after a distraction --- I can type <code>doing last</code> to see what the last thing on my plate was. I can also type <code>doing recent</code> (or just <code>doing</code>) to get a list of the last few entries. <code>doing today</code> gives me everything since midnight for the current day, making it easy to see what I've accomplished over a sleepless night.</p>
+
+<p><em>Side note:</em> I actually use the library behind this utility as part of another script that mirrors entries in <a href="http://dayoneapp.com/">Day One</a> that have the tag "wwid." I can use the hourly writing reminders and enter my stuff in the quick entry popup. Someday I'll get around to cleaning that up and putting it out there.</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<pre><code>[sudo] gem install doing
+</code></pre>
+
+<h2>
+<a name="the-doing-file" class="anchor" href="#the-doing-file"><span class="octicon octicon-link"></span></a>The "doing" file</h2>
+
+<p>The file that stores all of your entries is generated the first time you add an entry with <code>doing now</code> (or <code>doing later</code>). By default the file is created in "~/what_was_i_doing.md", but this can be modified in the config file.</p>
+
+<p>The format of the "doing" file is TaskPaper-compatible. You can edit it by hand at any time (in TaskPaper or any text editor), but it uses a specific format for parsing, so be sure to maintain the dates and pipe characters. </p>
+
+<p>Notes are anything in the list without a leading hyphen and date. They belong to the entry directly before them, and they should be indented one level beyond the parent item. The <code>now</code> and <code>later</code> commands don't currently make it possible to add notes at the time of entry creation, but I have scripts that do it and will incorporate them soon.</p>
+
+<h2>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p>A basic configuration looks like this:</p>
+
+<pre><code>---
+doing_file: /Users/username/Dropbox/nvALT2.2/?? What was I doing.md
+current_section: Currently
+default_template: '%date: %title%note'
+default_date_format: '%Y-%m-%d %H:%M'
+templates:
+  default:
+    date_format: '%Y-%m-%d %H:%M'
+    template: '%date | %title%note'
+    wrap_width: 0
+  today:
+    date_format: '%_I:%M%P'
+    template: '%date: %title%odnote'
+    wrap_width: 0
+  last:
+    date_format: '%_I:%M%P on %a'
+    template: '%title (at %date)%odnote'
+    wrap_width: 0
+  recent:
+    date_format: '%_I:%M%P'
+    template: '%date &gt; %title%odnote'
+    wrap_width: 50
+:include_notes: true
+</code></pre>
+
+<p>The config file is stored in "~/.doingrc", and is created on the first run. </p>
+
+<p>The one thing you'll probably want to adjust is the file that the notes are stored in. That's the <code>doing_file</code> key:</p>
+
+<pre><code>doing_file: /Users/username/Dropbox/nvALT2.2/?? What was I doing.md
+</code></pre>
+
+<p>I keep mind in my nvALT folder for quick access and syncing between machines. If desired, you can give it a <code>.taskpaper</code> extension to make it more recognizable to other applications. (If you do that in nvALT, make sure to add <code>taskpaper</code> as a recognized extension in preferences).</p>
+
+<p>You can rename the section that holds your current tasks. By default, this is "Currently," but if you have some other bright idea, feel free:</p>
+
+<pre><code>current_section: Currently
+</code></pre>
+
+<p>The config also contains templates for various command outputs. Include placeholders by placing a % before the keyword. The available tokens are:</p>
+
+<ul>
+<li>
+<code>%title</code>: the "what was I doing" entry line</li>
+<li>
+<code>%date</code>: the date based on the template's "date_format" setting</li>
+<li>
+<code>%shortdate</code>: a custom date formatter that removes the day/month/year from the entry if they match the current day/month/year</li>
+<li>
+<code>%note</code>: Any note in the entry will be included here, a newline and tabs are automatically added.</li>
+<li>
+<code>%odnote</code>: The notes with a leading tab removed (outdented note)</li>
+<li>
+<code>%hr</code>: a horizontal rule (<code>-</code>) the width of the terminal</li>
+<li>
+<code>%hr_under</code>: a horizontal rule (<code>_</code>) the width of the terminal</li>
+</ul><p>Date formats are based on Ruby <a href="http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime">strftime</a> formatting.</p>
+
+<p>My normal template for the <code>recent</code> command looks like this:</p>
+
+<pre><code>recent:
+  date_format: '%_I:%M%P'
+  template: '%date &gt; %title%odnote'
+  wrap_width: 88
+</code></pre>
+
+<p>And it outputs:</p>
+
+<pre><code>$ doing recent 3
+ 4:30am &gt; Made my `console` script smarter...
+    Checks first argument to see if it's a file, if it is, that's the log
+
+    Else, it checks the first argument for a ".log" suffix and does a search in the user
+    application logs with `find` for it.
+
+    Otherwise, system.log.
+
+    I also made an awesome Cope wrapper for it...
+12:00pm &gt; Working on `doing` again.
+12:45pm &gt; I think this thing (doing) is ready to document and distribute
+$ 
+</code></pre>
+
+<p>You can get pretty clever and include line breaks and other formatting inside of double quotes. If you want multiline templates, just use "\n" in the template line and after the next run it will be rewritten as proper YAML automatically.</p>
+
+<p>For example, this block:</p>
+
+<pre><code>recent:
+  date_format: '%_I:%M%P'
+  template: "\n%hr\n%date\n &gt; %title%odnote\n%hr_under"
+  wrap_width: 100
+</code></pre>
+
+<p>will rewrite to:</p>
+
+<pre><code>recent:
+  date_format: '%_I:%M%P'
+  template: |2-
+
+    %hr
+    %date
+     &gt; %title%odnote
+    %hr_under
+  wrap_width: 100
+</code></pre>
+
+<p>and output my recent entries like this:</p>
+
+<pre><code>$ doing recent 3
+-----------------------------------------------------------------------
+ 4:30am
+ &gt; Made my `console` script smarter...
+    Checks first argument to see if it's a file, if it is, that's the log
+
+    Else, it checks the first argument for a ".log" suffix and does a search in the user application
+    logs with `find` for it.
+
+    Otherwise, system.log.
+
+    I also made an awesome Cope wrapper for it...
+_______________________________________________________________________
+
+-----------------------------------------------------------------------
+12:00pm
+ &gt; Working on `doing` again.
+_______________________________________________________________________
+
+-----------------------------------------------------------------------
+12:45pm
+ &gt; I think this thing (doing) is ready to document and distribute
+_______________________________________________________________________
+
+$ 
+</code></pre>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage:</h2>
+
+<pre><code>doing [global options] command [command options] [arguments...]
+</code></pre>
+
+<h3>
+<a name="global-options" class="anchor" href="#global-options"><span class="octicon octicon-link"></span></a>Global options:</h3>
+
+<pre><code>--[no-]notes        - Output notes if included in the template (default: enabled)
+--version           - Display the program version
+--help              - Show help message and usage summary
+</code></pre>
+
+<h3>
+<a name="commands" class="anchor" href="#commands"><span class="octicon octicon-link"></span></a>Commands:</h3>
+
+<pre><code>help     - Shows a list of commands or help for one command (`doing help now`)
+</code></pre>
+
+<h4>
+<a name="adding-entries" class="anchor" href="#adding-entries"><span class="octicon octicon-link"></span></a>Adding entries:</h4>
+
+<pre><code>now      - Add an entry
+later    - Add an item to the Later section
+</code></pre>
+
+<h4>
+<a name="displaying-entries" class="anchor" href="#displaying-entries"><span class="octicon octicon-link"></span></a>Displaying entries:</h4>
+
+<pre><code>show     - List all entries
+recent   - List recent entries
+today    - List entries from today
+last     - Show the last entry
+</code></pre>
+
+<h4>
+<a name="sections" class="anchor" href="#sections"><span class="octicon octicon-link"></span></a>Sections</h4>
+
+<pre><code>sections - List sections
+choose   - Select a section to display from a menu
+</code></pre>
+
+<h4>
+<a name="utilities" class="anchor" href="#utilities"><span class="octicon octicon-link"></span></a>Utilities</h4>
+
+<pre><code>archive  - Move all but the most recent 5 entries to the Archive section
+config   - Edit the default configuration
+</code></pre>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/ttscoff/doing/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/ttscoff/doing/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/ttscoff/doing"></a> is maintained by <a href="https://github.com/ttscoff">ttscoff</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-34296025-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
