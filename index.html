@@ -44,8 +44,12 @@
 <h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<pre><code>[sudo] gem install doing
+<pre><code>$ [sudo] gem install doing
 </code></pre>
+
+<p>Only use <code>sudo</code> if your environment requires it. If you're using the system Ruby on a Mac, for example, it will likely be necessary. If <code>gem install doing</code> fails, then run <code>sudo gem install doing</code> and provide your administrator password.</p>
+
+<p>See the <a href="#support">support</a> section below for troubleshooting details.</p>
 
 <h2>
 <a name="the-doing-file" class="anchor" href="#the-doing-file"><span class="octicon octicon-link"></span></a>The "doing" file</h2>
@@ -88,17 +92,38 @@ templates:
 
 <p>The config file is stored in "~/.doingrc", and is created on the first run. </p>
 
+<h3>
+<a name="doing-file-location" class="anchor" href="#doing-file-location"><span class="octicon octicon-link"></span></a>Doing file location</h3>
+
 <p>The one thing you'll probably want to adjust is the file that the notes are stored in. That's the <code>doing_file</code> key:</p>
 
 <pre><code>doing_file: /Users/username/Dropbox/nvALT2.2/?? What was I doing.md
 </code></pre>
 
-<p>I keep mind in my nvALT folder for quick access and syncing between machines. If desired, you can give it a <code>.taskpaper</code> extension to make it more recognizable to other applications. (If you do that in nvALT, make sure to add <code>taskpaper</code> as a recognized extension in preferences).</p>
+<p>I keep mine in my nvALT folder for quick access and syncing between machines. If desired, you can give it a <code>.taskpaper</code> extension to make it more recognizable to other applications. (If you do that in nvALT, make sure to add <code>taskpaper</code> as a recognized extension in preferences).</p>
+
+<h3>
+<a name="current-actions-section" class="anchor" href="#current-actions-section"><span class="octicon octicon-link"></span></a>"Current actions" section</h3>
 
 <p>You can rename the section that holds your current tasks. By default, this is "Currently," but if you have some other bright idea, feel free:</p>
 
 <pre><code>current_section: Currently
 </code></pre>
+
+<h3>
+<a name="default-editors" class="anchor" href="#default-editors"><span class="octicon octicon-link"></span></a>Default editors</h3>
+
+<p>The setting <code>editor_app</code> only applies to Mac OS X users. It's the default application that the command <code>doing open</code> will open your WWID file in. If this is blank, it will be opened by whatever the system default is, or you can use <code>-a app_name</code> or <code>-b bundle_id</code> to override.</p>
+
+<p>In the case of the <code>doing now -e</code> command, your $EDITOR environment variable will be used to complete the entry text and notes. Set it in your .bash_profile or whatever is appropriate for your system:</p>
+
+<pre><code>export EDITOR="mate -w"
+</code></pre>
+
+<p>The only requirements are that your editor be launchable from the command line and able to "wait." In the case of Sublime Text and TextMate, just use <code>-w</code> like this: <code>export EDITOR="subl -w"</code>.</p>
+
+<h3>
+<a name="templates" class="anchor" href="#templates"><span class="octicon octicon-link"></span></a>Templates</h3>
 
 <p>The config also contains templates for various command outputs. Include placeholders by placing a % before the keyword. The available tokens are:</p>
 
@@ -117,6 +142,14 @@ templates:
 <code>%hr</code>: a horizontal rule (<code>-</code>) the width of the terminal</li>
 <li>
 <code>%hr_under</code>: a horizontal rule (<code>_</code>) the width of the terminal</li>
+<li>
+<code>%[color]</code>: color can be black, red, green, blue, yellow, magenta, cyan or white
+
+<ul>
+<li>you can prefix "bg" to affect background colors (%bgyellow)</li>
+<li>prefix "bold" and "boldbg" for strong colors (%boldgreen, %boldbgblue)</li>
+</ul>
+</li>
 </ul><p>Date formats are based on Ruby <a href="http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime">strftime</a> formatting.</p>
 
 <p>My normal template for the <code>recent</code> command looks like this:</p>
@@ -196,6 +229,55 @@ _______________________________________________________________________
 $ 
 </code></pre>
 
+<h3>
+<a name="custom-views" class="anchor" href="#custom-views"><span class="octicon octicon-link"></span></a>Custom views</h3>
+
+<p>You can create your own "views" in the <code>~/.doingrc</code> file and view them with <code>doing view view_name</code>. Just add a section like this:</p>
+
+<pre><code>views:
+  old:
+    section: Old
+    count: 5
+    wrap_width: 0
+    date_format: '%F %_I:%M%P'
+    template: '%date | %title%note' 
+</code></pre>
+
+<p>You can add additional custom views, just nest them under the "views" key (indented two spaces from the edge). Multiple views would look like this:</p>
+
+<pre><code>views:
+  later:
+    section: Later
+    count: 5
+    wrap_width: 60
+    date_format: '%F %_I:%M%P'
+    template: '%date | %title%note'
+  old:
+    section: Old
+    count: 5
+    wrap_width: 0
+    date_format: '%F %_I:%M%P'
+    template: '%date | %title%note' 
+</code></pre>
+
+<p>The "section" key is the default section to pull entries from. Count and section can be overridden at runtime with the <code>-c</code> and <code>-s</code> flags.</p>
+
+<p>You can add new sections with <code>done add_section section_name</code>. You can also create them on the fly by using the <code>-s section_name</code> flag when running <code>doing now</code>. For example, <code>doing now -s Misc just a random side note</code> would create the "just a random side note" entry in a new section called "Misc."</p>
+
+<p>Regarding colors, you can use them to create very nice displays if you're outputting to a color terminal. Example:</p>
+
+<pre><code>color:
+  date_format: '%F %_I:%M%P'
+  section: Currently
+  count: 10
+  wrap_width: 0
+  template: '%boldblack%date %boldgreen| %boldwhite%title%default%note'
+</code></pre>
+
+<p>Outputs: </p>
+
+<p><img src="http://ckyp.us/XKpj+" alt=""></p>
+
 <h2>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage:</h2>
 
@@ -221,6 +303,7 @@ $
 
 <pre><code>now      - Add an entry
 later    - Add an item to the Later section
+done     - Add an entry tagged with @done(YYYY-mm-dd hh:mm)
 </code></pre>
 
 <h4>
@@ -245,6 +328,48 @@ choose   - Select a section to display from a menu
 <pre><code>archive  - Move all but the most recent 5 entries to the Archive section
 config   - Edit the default configuration
 </code></pre>
+
+<hr><h2>
+<a name="troubleshooting" class="anchor" href="#troubleshooting"><span class="octicon octicon-link"></span></a>Troubleshooting</h2>
+
+<h3>
+<a name="errors-after-successfully-installed" class="anchor" href="#errors-after-successfully-installed"><span class="octicon octicon-link"></span></a>Errors after "Successfully installed..."</h3>
+
+<p>If you get errors in the terminal immediately after a message like:</p>
+
+<pre><code>Successfully installed doing-x.x.x
+2 gems installed
+</code></pre>
+
+<p>...it may just be documentation related. If running <code>doing</code> works, you can ignore them. If not, try running the install command again with <code>--no-document</code>:</p>
+
+<pre><code>$ gem install --no-document doing
+</code></pre>
+
+<h3>
+<a name="command-not-found" class="anchor" href="#command-not-found"><span class="octicon octicon-link"></span></a>Command not found</h3>
+
+<p>If running <code>doing</code> after a successful install gives you a "command not found" error, then your gem path isn't in your $PATH, meaning the system can't find it. To locate the gem and link it into your path, you can try this:</p>
+
+<pre><code>cd $GEM_PATH/bin
+ln -s doing /usr/local/bin/
+</code></pre>
+
+<p>Then try running <code>doing</code> and see if it works.</p>
+
+<h3>
+<a name="encoding-errors" class="anchor" href="#encoding-errors"><span class="octicon octicon-link"></span></a>Encoding errors</h3>
+
+<p>Ruby is rife with encoding inconsistencies across platforms and versions. Feel free to file issues (see below).</p>
+
+<h3>
+<a name="support" class="anchor" href="#support"><span class="octicon octicon-link"></span></a>Support</h3>
+
+<p>I'm not making any money on <code>doing</code>, and I don't plan to spend a lot of time fixing errors on an array of operating systems and platforms I don't even have access to. You'll probably have to solve some things on your own.</p>
+
+<p>That said, you can get support from other users (and occasionally me) on GitHub. If you run into a replicatable issue in your environment, please <a href="https://github.com/ttscoff/doing/issues">post an issue</a> and include your platform, OS version, and the result of <code>ruby -v</code>, along with a copy/paste of the error message.</p>
+
+<p>Please try not to email me directly about GitHub projects.</p>
         </section>
 
         <aside id="sidebar">
