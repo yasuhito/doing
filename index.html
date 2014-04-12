@@ -30,6 +30,8 @@
         <section id="main-content">
           <p><em>If you're one of the rare people like me who find this useful, feel free to contribute to my <a href="https://www.gittip.com/ttscoff/">GitTip fund</a> or just <a href="http://brettterpstra.com/donate">buy me some coffee</a>.</em></p>
 
+<p><a href="#changelog">Changelog</a></p>
+
 <h2>
 <a name="what-and-why" class="anchor" href="#what-and-why"><span class="octicon octicon-link"></span></a>What and why</h2>
 
@@ -49,6 +51,8 @@
 
 <p>Only use <code>sudo</code> if your environment requires it. If you're using the system Ruby on a Mac, for example, it will likely be necessary. If <code>gem install doing</code> fails, then run <code>sudo gem install doing</code> and provide your administrator password.</p>
 
+<p>Run <code>doing config</code> to open your <code>~/.doingrc</code> file in the editor defined in the $EDITOR environment variable. Set up your <code>doing_file</code> right away (where you want entries to be stored), and cover the rest after you've read the docs.</p>
+
 <p>See the <a href="#support">support</a> section below for troubleshooting details.</p>
 
 <h2>
@@ -58,7 +62,9 @@
 
 <p>The format of the "doing" file is TaskPaper-compatible. You can edit it by hand at any time (in TaskPaper or any text editor), but it uses a specific format for parsing, so be sure to maintain the dates and pipe characters. </p>
 
-<p>Notes are anything in the list without a leading hyphen and date. They belong to the entry directly before them, and they should be indented one level beyond the parent item. The <code>now</code> and <code>later</code> commands don't currently make it possible to add notes at the time of entry creation, but I have scripts that do it and will incorporate them soon.</p>
+<p>Notes are anything in the list without a leading hyphen and date. They belong to the entry directly before them, and they should be indented one level beyond the parent item. When using the <code>now</code> and <code>later</code> commands on the command line, you can start the entry with a quote and hit return, then type the note and close the quote. Anything after the first line will be turned into a TaskPaper-compatible note for the task and can be displayed in templates using <code>%note</code>.</p>
+
+<p>Notes can be prevented from ever appearing in output with the global option <code>--no-notes</code>: <code>doing --no-notes show all</code>.</p>
 
 <h2>
 <a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
@@ -70,6 +76,14 @@ doing_file: /Users/username/Dropbox/nvALT2.2/?? What was I doing.md
 current_section: Currently
 default_template: '%date: %title%note'
 default_date_format: '%Y-%m-%d %H:%M'
+views:
+  color:
+    date_format: '%F %_I:%M%P'
+    section: Currently
+    count: 10
+    wrap_width: 0
+    template: '%boldblack%date %boldgreen| %boldwhite%title%default%note'
+    order: desc
 templates:
   default:
     date_format: '%Y-%m-%d %H:%M'
@@ -115,7 +129,7 @@ templates:
 
 <p>The setting <code>editor_app</code> only applies to Mac OS X users. It's the default application that the command <code>doing open</code> will open your WWID file in. If this is blank, it will be opened by whatever the system default is, or you can use <code>-a app_name</code> or <code>-b bundle_id</code> to override.</p>
 
-<p>In the case of the <code>doing now -e</code> command, your $EDITOR environment variable will be used to complete the entry text and notes. Set it in your .bash_profile or whatever is appropriate for your system:</p>
+<p>In the case of the <code>doing now -e</code> command, your $EDITOR environment variable will be used to complete the entry text and notes. Set it in your <code>~/.bash_profile</code> or whatever is appropriate for your system:</p>
 
 <pre><code>export EDITOR="mate -w"
 </code></pre>
@@ -150,6 +164,8 @@ templates:
 <li>prefix "bold" and "boldbg" for strong colors (%boldgreen, %boldbgblue)</li>
 </ul>
 </li>
+<li>
+<code>%interval</code>: when used with the <code>-t</code> switch on the <code>show</code> command, it will display the time between a timestamp or <code>@start(date)</code> tag and the <code>@done(date)</code> tag, if it exists. Otherwise, it will remain empty.</li>
 </ul><p>Date formats are based on Ruby <a href="http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html#method-i-strftime">strftime</a> formatting.</p>
 
 <p>My normal template for the <code>recent</code> command looks like this:</p>
@@ -240,7 +256,10 @@ $
     count: 5
     wrap_width: 0
     date_format: '%F %_I:%M%P'
-    template: '%date | %title%note' 
+    template: '%date | %title%note'
+    order: asc
+    tags: done finished cancelled
+    tags_bool: ANY
 </code></pre>
 
 <p>You can add additional custom views, just nest them under the "views" key (indented two spaces from the edge). Multiple views would look like this:</p>
@@ -260,9 +279,13 @@ $
     template: '%date | %title%note' 
 </code></pre>
 
-<p>The "section" key is the default section to pull entries from. Count and section can be overridden at runtime with the <code>-c</code> and <code>-s</code> flags.</p>
+<p>The "section" key is the default section to pull entries from. Count and section can be overridden at runtime with the <code>-c</code> and <code>-s</code> flags. Setting <code>section</code> to All will combine all sections in the output.</p>
 
-<p>You can add new sections with <code>done add_section section_name</code>. You can also create them on the fly by using the <code>-s section_name</code> flag when running <code>doing now</code>. For example, <code>doing now -s Misc just a random side note</code> would create the "just a random side note" entry in a new section called "Misc."</p>
+<p>You can add new sections with <code>doing add_section section_name</code>. You can also create them on the fly by using the <code>-s section_name</code> flag when running <code>doing now</code>. For example, <code>doing now -s Misc just a random side note</code> would create the "just a random side note" entry in a new section called "Misc," if Misc didn't already exist.</p>
+
+<p>The <code>tags</code> and <code>tags_bool</code> keys allow you to specify tags that the view is filtered by. You can list multiple tags separated by spaces, and then use <code>tags_bool</code> to specify "ALL," "ANY," or "NONE" to determine how it handles the multiple tags.</p>
+
+<p>The <code>order</code> key defines the sort order of the output. This is applied <em>after</em> the tasks are retrieved and cut off at the maximum number specified in <code>count</code>.</p>
 
 <p>Regarding colors, you can use them to create very nice displays if you're outputting to a color terminal. Example:</p>
 
@@ -295,7 +318,8 @@ $
 <h3>
 <a name="commands" class="anchor" href="#commands"><span class="octicon octicon-link"></span></a>Commands:</h3>
 
-<pre><code>help     - Shows a list of commands or help for one command (`doing help now`)
+<pre><code>help           - Shows a list of commands and global options
+help [command] - Shows help for any command (`doing help now`)
 </code></pre>
 
 <h4>
@@ -303,33 +327,141 @@ $
 
 <pre><code>now      - Add an entry
 later    - Add an item to the Later section
-done     - Add an entry tagged with @done(YYYY-mm-dd hh:mm)
+done     - Add a completed item with @done(date). No argument finishes last entry.
+meanwhile - Finish any @meanwhile tasks and optionally create a new one
 </code></pre>
+
+<p>The <code>doing now</code> command can accept <code>-s section_name</code> to send the new entry straight to a non-default section. </p>
+
+<p><code>doing done</code> is used to add an entry that you've already completed. Like <code>now</code>, you can specify a section with <code>-s section_name</code>. You can also skip straight to Archive with <code>-a</code>.</p>
+
+<p>You can also backdate entries using natural language with <code>--back 15m</code> or <code>--back "3/15 3pm"</code>. That will modify the timestamp of the entry. When used with <code>doing done</code>, this allows time intervals to be accurately counted when entering items after the fact.</p>
+
+<p>All of these commands accept a <code>-e</code> argument. This opens your command line editor as defined in the environment variable <code>$EDITOR</code>. Add your entry, save the temp file and close it, and the new entry will be added. Anything after the first line is included as a note on the entry.</p>
+
+<p><code>doing meanwhile</code> is a special command for creating and finishing tasks that may have other entries come before they're complete. When you create an entry with <code>doing meanwhile [entry text]</code>, it will automatically complete the last <a href="https://github.com/meanwhile" class="user-mention">@meanwhile</a> item (dated <a href="https://github.com/done" class="user-mention">@done</a> tag) and add the <a href="https://github.com/meanwhile" class="user-mention">@meanwhile</a> tag to the new item. This allows time tracking on a more general basis, and still lets you keep track of the smaller things you do while working on an overarching project. The <code>meanwhile</code> command accepts <code>--back [time]</code> and will backdate the <a href="https://github.com/done" class="user-mention">@done</a> tag and start date of the new task at the same time. Running <code>meanwhile</code> with no arguments will simply complete the last <a href="https://github.com/meanwhile" class="user-mention">@meanwhile</a> task. See <code>doing help meanwhile</code> for more options.</p>
+
+<h4>
+<a name="modifying-entries" class="anchor" href="#modifying-entries"><span class="octicon octicon-link"></span></a>Modifying entries:</h4>
+
+<pre><code>finish      - Mark last X entries as @done
+tag         - Tag last entry
+</code></pre>
+
+<p><code>doing finish</code> by itself is the same as <code>doing done</code> by itself. It adds <code>@done(timestamp)</code> to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add <code>-a</code> to also archive the affected entries.</p>
+
+<p><code>tag</code> adds one or more tags to the last entry, or specify a count with <code>-c X</code>. Tags are specified as basic arguments, separated by spaces. For example:</p>
+
+<pre><code>doing tag -c 3 client cancelled
+</code></pre>
+
+<p>... will mark the last three entries as "<a href="https://github.com/client" class="user-mention">@client</a> <a href="https://github.com/cancelled" class="user-mention">@cancelled</a>." Add <code>-r</code> as a switch to remove the listed tags instead.</p>
 
 <h4>
 <a name="displaying-entries" class="anchor" href="#displaying-entries"><span class="octicon octicon-link"></span></a>Displaying entries:</h4>
 
-<pre><code>show     - List all entries
-recent   - List recent entries
-today    - List entries from today
-last     - Show the last entry
+<pre><code>show      - List all entries
+recent    - List recent entries
+today     - List entries from today
+yesterday - List entries from yesterday
+last      - Show the last entry
 </code></pre>
+
+<p><code>doing show</code> on its own will list all entries in the "Currently" section. Add a section name as an argument to display that section instead. Use "all" to display all entries from all sections.</p>
+
+<p>You can filter the <code>show</code> command by tags. Simply list them after the section name (or "all"). The boolean defaults to "ANY," meaning any entry that contains any of the listed tags will be shown. You can use <code>-b ALL</code> or <code>-b NONE</code> to change the filtering behavior: <code>doing show all done cancelled -b NONE</code> will show all tasks from all sections that do not have either "<a href="https://github.com/done" class="user-mention">@done</a>" or "<a href="https://github.com/cancelled" class="user-mention">@cancelled</a>" tags.</p>
+
+<p>Use <code>-c X</code> to limit the displayed results. Combine it with <code>-a newest</code> or <code>-a oldest</code> to choose which chronological end it trims from. You can also set the sort order of the output with <code>-s asc</code> or <code>-s desc</code>.</p>
+
+<p>The <code>show</code> command can also show the time spent on a task if it has a <code>@done(date)</code> tag with the <code>-t</code> option. This requires that you include a <code>%interval</code> token in template -&gt; default in the config. You can also include <code>@start(date)</code> tags, which override the timestamp when calculating the intervals.</p>
+
+<p>If you have a use for it, you can use <code>--csv</code> on the show or view commands to output the results as a comma-separated CSV to STDOUT. Redirect to a file to save it: <code>doing show all done --csv &gt; ~/Desktop/done.csv</code>.</p>
+
+<p><code>doing yesterday</code> is great for stand-ups, thanks to <a href="https://github.com/sc68cal">Sean Collins</a> for that. Note that you can show yesterday's activity from an alternate section by using the section name as an argument (e.g. <code>doing yesterday archive</code>).</p>
+
+<h4>
+<a name="views" class="anchor" href="#views"><span class="octicon octicon-link"></span></a>Views</h4>
+
+<pre><code>view     - Display a user-created view
+views    - List available custom views
+</code></pre>
+
+<p>Display any of the custom views you make in <code>~/.doingrc</code> with the <code>view</code> command. Use <code>doing views</code> to get a list of available views. Any time a section or view is specified on the command line, fuzzy matching will be used to find the closest match. Thus, <code>lat</code> will match <code>Later</code>, etc..</p>
 
 <h4>
 <a name="sections" class="anchor" href="#sections"><span class="octicon octicon-link"></span></a>Sections</h4>
 
-<pre><code>sections - List sections
-choose   - Select a section to display from a menu
+<pre><code>sections    - List sections
+choose      - Select a section to display from a menu
+add_section - Add a new section to the "doing" file
 </code></pre>
 
 <h4>
 <a name="utilities" class="anchor" href="#utilities"><span class="octicon octicon-link"></span></a>Utilities</h4>
 
-<pre><code>archive  - Move all but the most recent 5 entries to the Archive section
+<pre><code>archive  - Move entries between sections
+open     - Open the "doing" file in an editor (OS X)
 config   - Edit the default configuration
 </code></pre>
 
+<h4>
+<a name="archiving" class="anchor" href="#archiving"><span class="octicon octicon-link"></span></a>Archiving</h4>
+
+<pre><code>COMMAND OPTIONS
+    -k, --keep=arg - Count to keep (ignored if archiving by tag) (default: 5)
+    -t, --to=arg   - Move entries to (default: Archive)
+    -b, --bool=arg - Tag boolean (default: AND)
+</code></pre>
+
+<p>The <code>archive</code> command will move entries from one section (default: Currently) to another section (default: Archive). </p>
+
+<p><code>doing archive</code> on its own will move all but the most recent 5 entries from currently into the archive.</p>
+
+<p><code>doing archive other_section</code> will archive from "other_section" to Archive.</p>
+
+<p><code>doing archive other_section -t alternate</code> will move from "other_section" to "alternate." You can use the <code>-k</code> flag on any of these to change the number of items to leave behind. To move everything, use <code>-k 0</code>.</p>
+
+<p>You can also use tags to archive. You define the section first, and anything following it is treated as tags. If your first argument starts with "@", it will assume all sections and assume any following arguments are tags.</p>
+
+<p>By default tag archiving uses an "AND" boolean, meaning all the tags listed must exist on the entry for it to be moved. You can change this behavior with <code>-b OR</code> or <code>-b NONE</code> ("ALL" and "ANY" also work). </p>
+
+<p>Example: Archive all Currently items for <a href="https://github.com/client" class="user-mention">@client</a> that are marked <a href="https://github.com/done" class="user-mention">@done</a></p>
+
+<pre><code>doing archive @client @done
+</code></pre>
+
 <hr><h2>
+<a name="extras" class="anchor" href="#extras"><span class="octicon octicon-link"></span></a>Extras</h2>
+
+<h3>
+<a name="bash-completion" class="anchor" href="#bash-completion"><span class="octicon octicon-link"></span></a>Bash completion</h3>
+
+<p>See the file <code>doing.completion.bash</code> in the git repository for full bash completion. Thanks to <a href="https://github.com/fcrespo82">fcrespo82</a> for getting it <a href="https://gist.github.com/fcrespo82/9609318">started</a>.</p>
+
+<h3>
+<a name="launchbar" class="anchor" href="#launchbar"><span class="octicon octicon-link"></span></a>Launchbar</h3>
+
+<p>The previous incarnation of <code>doing</code> had a <a href="http://obdev.at/launchbar/">LaunchBar</a> action that I used frequently. The Day One popup has mostly replaced that for me, but only because I have a system that connects it to my WWID file. However, I've still found a place for adding WWID entries without including them in my journal, and LaunchBar is the perfect way to do that for me.</p>
+
+<p>All you need is an AppleScript saved at "~/Library/Application Support/LaunchBar/Actions/Doing.scpt". It should look like this:</p>
+
+<pre><code>on handle_string(message)
+    -- get the input from LaunchBar
+    if message is "?" then
+        -- if the input is just "?" display the last three entries
+        set _doing to do shell script "/usr/bin/doing recent 3"
+        tell application "LaunchBar" to display in large type _doing
+    else
+        -- otherwise, create a new entry using the input
+        do shell script "/usr/bin/doing now " &amp; quoted form of message
+    end if
+
+end handle_string
+</code></pre>
+
+<p>Evan Lovely has <a href="http://www.evanlovely.com/blog/technology/alfred-for-terpstras-doing/">converted this to an Alfred workflow as well</a>.</p>
+
+<h2>
 <a name="troubleshooting" class="anchor" href="#troubleshooting"><span class="octicon octicon-link"></span></a>Troubleshooting</h2>
 
 <h3>
@@ -370,6 +502,170 @@ ln -s doing /usr/local/bin/
 <p>That said, you can get support from other users (and occasionally me) on GitHub. If you run into a replicatable issue in your environment, please <a href="https://github.com/ttscoff/doing/issues">post an issue</a> and include your platform, OS version, and the result of <code>ruby -v</code>, along with a copy/paste of the error message.</p>
 
 <p>Please try not to email me directly about GitHub projects.</p>
+
+<h3>
+<a name="changelog" class="anchor" href="#changelog"><span class="octicon octicon-link"></span></a>Changelog</h3>
+
+<h4>
+<a name="025" class="anchor" href="#025"><span class="octicon octicon-link"></span></a>0.2.5</h4>
+
+<ul>
+<li>Default to showing times #26, show totals even if no tags exist #27, fix indentation #29</li>
+<li>Add section label to archived tasks automatically, excepting Currently section</li>
+<li>Today outputs and backdate for finish</li>
+<li>html styling and fix for 1.8.7 haml errors</li>
+<li>Look, HTML output! (<code>--output html</code>)</li>
+<li>Also, <code>--output csv</code>
+</li>
+<li>let doing archive function on all sections</li>
+<li>option to exclude date from <code>@done</code>,<br>
+</li>
+<li>output newlines in sections and views</li>
+<li>Flagging (<code>doing mark</code>)</li>
+<li>fix for view/section guess error</li>
+<li>Adding tag filtering to archive command (<code>doing archive \@done</code>)</li>
+<li><code>doing yesterday</code></li>
+<li>
+<code>doing done -r</code> to remove last doing tag (optionally from <code>-s Section</code>)</li>
+<li>Add -f flag to specify alternate doing file</li>
+<li>Meanwhile command</li>
+</ul><h4>
+<a name="021" class="anchor" href="#021"><span class="octicon octicon-link"></span></a>0.2.1</h4>
+
+<ul>
+<li>CSV output for show command (<code>--csv</code>)</li>
+<li>HTML output for show command (<code>--output html</code>)</li>
+<li>fuzzy searching for all commands that specify a view. 
+
+<ul>
+<li>On the terminal you'll see "Assume you meant XXX" to show what match it found, but this is output to STDERR and won't show up if you're redirecting the output or using it in GeekTool, etc.</li>
+</ul>
+</li>
+<li>tags_color in view config to highlight tags at the end of the lines. Can be set to any of the %colors.</li>
+<li>Basic time tracking. 
+
+<ul>
+<li>
+<code>-t</code> on <code>show</code> and <code>view</code> will turn on time calculations</li>
+<li>Intervals between timestamps and dated <code>@done</code> tags are calculated for each line, if the tag exists. </li>
+<li>You must include a %interval token in the appropriate template for it to show</li>
+<li>
+<code>@start(date)</code> tags can optionally be used to override the time stamp in the calculation</li>
+<li>Any other tags in the line have that line's total added to them</li>
+<li>Totals for tags can be displayed at the end of output with <code>--totals</code>
+</li>
+</ul>
+</li>
+</ul><h4>
+<a name="020" class="anchor" href="#020"><span class="octicon octicon-link"></span></a>0.2.0</h4>
+
+<ul>
+<li>
+<code>doing done</code> without argument tags last entry done
+
+<ul>
+<li>
+<code>-a</code> archives them</li>
+</ul>
+</li>
+<li>
+<code>doing finish</code> or <code>doing finish X</code> marks last X entries done
+
+<ul>
+<li>
+<code>-a</code> archives them</li>
+</ul>
+</li>
+<li>
+<code>doing tag tag1 [tag2]</code> tags last entry or <code>-c X</code> entries
+
+<ul>
+<li>
+<code>doing tag -r tag1 [tag2]</code> removes said tag(s)</li>
+</ul>
+</li>
+<li>custom views additions
+
+<ul>
+<li>custom views can include <code>tags</code> and <code>tags_bool</code>
+
+<ul>
+<li>tags is a space separated list of tags to filter the results by</li>
+<li>tags_bool defines AND (all tags must exist), OR (any tag exists), or NONE (none of the tags exist)</li>
+</ul>
+</li>
+<li>order key (asc or desc) defines output sort order by date</li>
+<li>section key can be set to "All" to combine sections</li>
+</ul>
+</li>
+<li>
+<code>doing show</code> updates
+
+<ul>
+<li>accepts "all" as a section</li>
+<li>arguments following section name are tags to filter by
+
+<ul>
+<li>
+<code>-b</code> sets boolean (AND, OR, NONE) or (ALL, ANY, NONE) (default OR/ANY)</li>
+</ul>
+</li>
+<li>use <code>-c X</code> to limit results</li>
+<li>use <code>-s</code> to set sort order (asc or desc)</li>
+<li>use <code>-a</code> to set age (newest or oldest)</li>
+</ul>
+</li>
+<li>fuzzy section guessing when specified section isn't found</li>
+<li>fuzzy view guessing for <code>doing view</code> command</li>
+</ul><hr><h4>
+<a name="019" class="anchor" href="#019"><span class="octicon octicon-link"></span></a>0.1.9</h4>
+
+<ul>
+<li>colors in templated output</li>
+<li>open command
+
+<ul>
+<li>opens in the default app for file type</li>
+<li>-a APPNAME (<code>doing open -a TaskPaper</code>)</li>
+<li>-b bundle_id (<code>doing open -b com.sublimetext.3</code>)</li>
+</ul>
+</li>
+<li>-e switch for <code>now</code>, <code>later</code> and <code>done</code> commands
+
+<ul>
+<li>save a tmp file and open it in an editor</li>
+<li>allows multi-line entries, anything after first line is considered a note</li>
+<li>assumed when no input is provided (<code>doing now</code>)</li>
+</ul>
+</li>
+<li>
+<code>doing views</code> shows all available custom views</li>
+<li>
+<code>doing view</code> without a view name will let you choose a view from a menu</li>
+<li>
+<code>doing archive</code> fixed so that <code>-k X</code> works to keep X number of entries in the section</li>
+</ul><h4>
+<a name="017" class="anchor" href="#017"><span class="octicon octicon-link"></span></a>0.1.7</h4>
+
+<ul>
+<li>colors in templated output</li>
+<li>open command
+
+<ul>
+<li>opens in the default app for file type</li>
+<li>-a APPNAME (<code>doing open -a TaskPaper</code>)</li>
+<li>-b bundle_id (<code>doing open -b com.sublimetext.3</code>)</li>
+</ul>
+</li>
+<li>-e switch for <code>now</code>, <code>later</code> and <code>done</code> commands
+
+<ul>
+<li>save a tmp file and open it in an editor</li>
+<li>allows multi-line entries, anything after first line is considered a note</li>
+<li>assumed when no input is provided (<code>doing now</code>)</li>
+</ul>
+</li>
+</ul>
         </section>
 
         <aside id="sidebar">
