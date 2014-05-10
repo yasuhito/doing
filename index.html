@@ -331,11 +331,13 @@ done     - Add a completed item with @done(date). No argument finishes last entr
 meanwhile - Finish any @meanwhile tasks and optionally create a new one
 </code></pre>
 
-<p>The <code>doing now</code> command can accept <code>-s section_name</code> to send the new entry straight to a non-default section. </p>
+<p>The <code>doing now</code> command can accept <code>-s section_name</code> to send the new entry straight to a non-default section. It also accepts <code>--back AMOUNT</code> to let you specify a start date in the past using "natural language." For example, <code>doing now --back 25m ENTRY</code> or <code>doing now --back "yesterday 3:30pm" ENTRY</code>.</p>
+
+<p>You can finish the last unfinished task when starting a new one using <code>doing now</code> with the <code>-f</code> switch. It will look for the last task not marked <code>@done</code> and add the <code>@done</code> tag with the start time of the new task (either the current time or what you specified with <code>--back</code>).</p>
 
 <p><code>doing done</code> is used to add an entry that you've already completed. Like <code>now</code>, you can specify a section with <code>-s section_name</code>. You can also skip straight to Archive with <code>-a</code>.</p>
 
-<p>You can also backdate entries using natural language with <code>--back 15m</code> or <code>--back "3/15 3pm"</code>. That will modify the timestamp of the entry. When used with <code>doing done</code>, this allows time intervals to be accurately counted when entering items after the fact.</p>
+<p>You can also backdate entries using natural language with <code>--back 15m</code> or <code>--back "3/15 3pm"</code>. That will modify the starting timestamp of the entry. You can also use <code>--took 1h20m</code> or <code>--took 1:20</code> to set the finish date based on a "natural language" time interval. When used with <code>doing done</code>, this allows time intervals to be accurately counted when entering items after the fact. <code>--took</code> is also available for the <code>doing finish</code> command, but cannot be used in conjunction with <code>--back</code>. (In <code>finish</code> they both set the end date, and neither has priority. <code>--back</code> allows specific days/times, <code>--took</code> uses time intervals.)</p>
 
 <p>All of these commands accept a <code>-e</code> argument. This opens your command line editor as defined in the environment variable <code>$EDITOR</code>. Add your entry, save the temp file and close it, and the new entry will be added. Anything after the first line is included as a note on the entry.</p>
 
@@ -504,9 +506,23 @@ ln -s doing /usr/local/bin/
 <p>Please try not to email me directly about GitHub projects.</p>
 
 <h3>
+<a name="developer-notes" class="anchor" href="#developer-notes"><span class="octicon octicon-link"></span></a>Developer notes</h3>
+
+<p>I'll try to document some of the code structure as I flesh it out. I'm currently working on adding a CLI reporting structure and logging methods, as well as santizing and standardizing all the flags and switches for consistency. Feel free to <a href="http://github.com/ttscoff/doing/">poke around</a>, I'll try to add more comments in the future (and retroactively).</p>
+
+<h3>
 <a name="changelog" class="anchor" href="#changelog"><span class="octicon octicon-link"></span></a>Changelog</h3>
 
 <h4>
+<a name="026pre" class="anchor" href="#026pre"><span class="octicon octicon-link"></span></a>0.2.6pre</h4>
+
+<ul>
+<li>--totals, --[no-]times, --output [csv,html] options for yesterday command.</li>
+<li>Add tests for Darwin to hide OS X-only features on other systems</li>
+<li>-f flag to <code>now</code> command for finishing last task when starting a new one (Looks back for the last unfinished task in the list)</li>
+<li>--took option for <code>done</code> and <code>finish</code> for specifying intervals from the start date for the completion date</li>
+<li>Basic command line reporting</li>
+</ul><h4>
 <a name="025" class="anchor" href="#025"><span class="octicon octicon-link"></span></a>0.2.5</h4>
 
 <ul>
