@@ -348,16 +348,25 @@ meanwhile - Finish any @meanwhile tasks and optionally create a new one
 
 <pre><code>finish      - Mark last X entries as @done
 tag         - Tag last entry
+note        - Add a note to the last entry
 </code></pre>
 
 <p><code>doing finish</code> by itself is the same as <code>doing done</code> by itself. It adds <code>@done(timestamp)</code> to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add <code>-a</code> to also archive the affected entries.</p>
+
+<p><code>doing finish</code> also provides an <code>--auto</code> flag, which you can use to set the end time of any entry to 1 minute before the start time of the next. Running a command such as <code>doing finish --auto 10</code> will go through the last 10 entries and sequentially update any without a <code>@done</code> tag with one set to the time just before the next entry in the list.</p>
+
+<p>As mentioned above, <code>finish</code> also accepts <code>--back "2 hours"</code> (sets the date from time now minus interval) or <code>--took 30m</code> (sets the date from time started plus interval) so you can accurately add times to completed tasks, even if you don't do it in the moment.</p>
 
 <p><code>tag</code> adds one or more tags to the last entry, or specify a count with <code>-c X</code>. Tags are specified as basic arguments, separated by spaces. For example:</p>
 
 <pre><code>doing tag -c 3 client cancelled
 </code></pre>
 
-<p>... will mark the last three entries as "<a href="https://github.com/client" class="user-mention">@client</a> <a href="https://github.com/cancelled" class="user-mention">@cancelled</a>." Add <code>-r</code> as a switch to remove the listed tags instead.</p>
+<p>... will mark the last three entries as "@client <a href="https://github.com/cancelled" class="user-mention">@cancelled</a>." Add <code>-r</code> as a switch to remove the listed tags instead.</p>
+
+<p><code>note</code> lets you enter a note on the last entry. You can specify a section with <code>-s section_name</code>. <code>-e</code> will open your $EDITOR for typing the note, but you can just include it on the command line after any arguments. You can also pipe a note in on STDIN (<code>echo "fun stuff"|doing note</code>). The <code>-r</code> switch will remove/replace a note; if there's new note text passed when using the <code>-r</code> switch, it will replace any existing note. If the <code>-r</code> switch is used alone, any existing note will be removed.</p>
+
+<p>You can also add notes at the time of entry by using the <code>-n</code> or <code>--note</code> flag with <code>doing now</code>, <code>doing later</code>, or <code>doing done</code>. If you pass in text to any of the creation commands that has multiple lines, everything after the first line break will become the note.</p>
 
 <h4>
 <a name="displaying-entries" class="anchor" href="#displaying-entries"><span class="octicon octicon-link"></span></a>Displaying entries:</h4>
@@ -367,6 +376,7 @@ recent    - List recent entries
 today     - List entries from today
 yesterday - List entries from yesterday
 last      - Show the last entry
+grep      - Show entries matching text or pattern
 </code></pre>
 
 <p><code>doing show</code> on its own will list all entries in the "Currently" section. Add a section name as an argument to display that section instead. Use "all" to display all entries from all sections.</p>
@@ -427,7 +437,7 @@ config   - Edit the default configuration
 
 <p>By default tag archiving uses an "AND" boolean, meaning all the tags listed must exist on the entry for it to be moved. You can change this behavior with <code>-b OR</code> or <code>-b NONE</code> ("ALL" and "ANY" also work). </p>
 
-<p>Example: Archive all Currently items for <a href="https://github.com/client" class="user-mention">@client</a> that are marked <a href="https://github.com/done" class="user-mention">@done</a></p>
+<p>Example: Archive all Currently items for @client that are marked <a href="https://github.com/done" class="user-mention">@done</a></p>
 
 <pre><code>doing archive @client @done
 </code></pre>
@@ -522,6 +532,9 @@ ln -s doing /usr/local/bin/
 <li>-f flag to <code>now</code> command for finishing last task when starting a new one (Looks back for the last unfinished task in the list)</li>
 <li>--took option for <code>done</code> and <code>finish</code> for specifying intervals from the start date for the completion date</li>
 <li>Basic command line reporting</li>
+<li>--auto flag for <code>finish</code> and <code>done</code> that will automatically set the completion time to 1 minute before the next start time in the list. You can use it retroactively to add times to sequential todos.</li>
+<li>
+<code>doing grep</code> for searching by text or regex</li>
 </ul><h4>
 <a name="025" class="anchor" href="#025"><span class="octicon octicon-link"></span></a>0.2.5</h4>
 
