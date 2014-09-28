@@ -1,38 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <title>doing by ttscoff</title>
 
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
-    <title>doing by ttscoff</title>
   </head>
-
   <body>
-    <header>
-      <div class="inner">
-        <h1>doing</h1>
-        <h2>A command line tool for remembering what you were doing and tracking what you&#39;ve done.</h2>
-        <a href="https://github.com/ttscoff/doing" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">doing</h1>
+        <p class="header">A command line tool for remembering what you were doing and tracking what you&#39;ve done.</p>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <p><em>If you're one of the rare people like me who find this useful, feel free to contribute to my <a href="https://www.gittip.com/ttscoff/">GitTip fund</a> or just <a href="http://brettterpstra.com/donate">buy me some coffee</a>.</em></p>
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/ttscoff/doing/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/ttscoff/doing/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/ttscoff/doing">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/ttscoff">ttscoff</a></p>
+
+
+      </header>
+      <section>
+        <p><em>If you're one of the rare people like me who find this useful, feel free to contribute to my <a href="https://www.gittip.com/ttscoff/">GitTip fund</a> or just <a href="http://brettterpstra.com/donate">buy me some coffee</a>.</em></p>
 
 <p><a href="#changelog">Changelog</a></p>
 
 <h2>
+<a name="contents" class="anchor" href="#contents"><span class="octicon octicon-link"></span></a>Contents</h2>
+
+<ul>
+<li><a href="#what-and-why">What and why</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#the-doing-file">The "doing" file</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#extras">Extras</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ul><h2>
 <a name="what-and-why" class="anchor" href="#what-and-why"><span class="octicon octicon-link"></span></a>What and why</h2>
 
 <p><code>doing</code> is a basic CLI for adding and listing "what was I doing" reminders in a <a href="http://www.hogbaysoftware.com/products/taskpaper">TaskPaper-formatted</a> text file. It allows for multiple sections/categories and flexible output formatting.</p>
@@ -47,6 +60,11 @@
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <pre><code>$ [sudo] gem install doing
+</code></pre>
+
+<p>To install the <em>latest</em> version, use <code>--pre</code>:</p>
+
+<pre><code>$ [sudo] gem install --pre doing
 </code></pre>
 
 <p>Only use <code>sudo</code> if your environment requires it. If you're using the system Ruby on a Mac, for example, it will likely be necessary. If <code>gem install doing</code> fails, then run <code>sudo gem install doing</code> and provide your administrator password.</p>
@@ -153,15 +171,22 @@ templates:
 <li>
 <code>%odnote</code>: The notes with a leading tab removed (outdented note)</li>
 <li>
+<code>%chompnote</code>: Notes on one line, beginning and trailing whitespace removed.</li>
+<li>
 <code>%hr</code>: a horizontal rule (<code>-</code>) the width of the terminal</li>
 <li>
 <code>%hr_under</code>: a horizontal rule (<code>_</code>) the width of the terminal</li>
+<li>
+<code>%n</code>: inserts a newline</li>
+<li>
+<code>%t</code>: inserts a tab</li>
 <li>
 <code>%[color]</code>: color can be black, red, green, blue, yellow, magenta, cyan or white
 
 <ul>
 <li>you can prefix "bg" to affect background colors (%bgyellow)</li>
 <li>prefix "bold" and "boldbg" for strong colors (%boldgreen, %boldbgblue)</li>
+<li>there are some random special combo colors. Use <code>doing colors</code> to see the list</li>
 </ul>
 </li>
 <li>
@@ -301,8 +326,10 @@ $
 
 <p><img src="http://ckyp.us/XKpj+" alt=""></p>
 
+<p>You can also specify a default output format for a view. Most of the optional output formats override the template specification (html, csv, json). If the <code>view</code> command is used with the <code>-o</code> flag, it will override what's specified in the file.</p>
+
 <h2>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage:</h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <pre><code>doing [global options] command [command options] [arguments...]
 </code></pre>
@@ -337,7 +364,9 @@ meanwhile - Finish any @meanwhile tasks and optionally create a new one
 
 <p><code>doing done</code> is used to add an entry that you've already completed. Like <code>now</code>, you can specify a section with <code>-s section_name</code>. You can also skip straight to Archive with <code>-a</code>.</p>
 
-<p>You can also backdate entries using natural language with <code>--back 15m</code> or <code>--back "3/15 3pm"</code>. That will modify the starting timestamp of the entry. You can also use <code>--took 1h20m</code> or <code>--took 1:20</code> to set the finish date based on a "natural language" time interval. When used with <code>doing done</code>, this allows time intervals to be accurately counted when entering items after the fact. <code>--took</code> is also available for the <code>doing finish</code> command, but cannot be used in conjunction with <code>--back</code>. (In <code>finish</code> they both set the end date, and neither has priority. <code>--back</code> allows specific days/times, <code>--took</code> uses time intervals.)</p>
+<p><code>doing done</code> can also backdate entries using natural language with <code>--back 15m</code> or <code>--back "3/15 3pm"</code>. That will modify the starting timestamp of the entry. You can also use <code>--took 1h20m</code> or <code>--took 1:20</code> to set the finish date based on a "natural language" time interval. If <code>--took</code> is used without <code>--back</code>, then the start date is adjusted (<code>--took</code> interval is subtracted) so that the completion date is the current time.</p>
+
+<p>When used with <code>doing done</code>, <code>--back</code> and <code>--took</code> allow time intervals to be accurately counted when entering items after the fact. <code>--took</code> is also available for the <code>doing finish</code> command, but cannot be used in conjunction with <code>--back</code>. (In <code>finish</code> they both set the end date, and neither has priority. <code>--back</code> allows specific days/times, <code>--took</code> uses time intervals.)</p>
 
 <p>All of these commands accept a <code>-e</code> argument. This opens your command line editor as defined in the environment variable <code>$EDITOR</code>. Add your entry, save the temp file and close it, and the new entry will be added. Anything after the first line is included as a note on the entry.</p>
 
@@ -351,22 +380,55 @@ tag         - Tag last entry
 note        - Add a note to the last entry
 </code></pre>
 
+<h5>
+<a name="finishing" class="anchor" href="#finishing"><span class="octicon octicon-link"></span></a>Finishing</h5>
+
 <p><code>doing finish</code> by itself is the same as <code>doing done</code> by itself. It adds <code>@done(timestamp)</code> to the last entry. It also accepts a numeric argument to complete X number of tasks back in history. Add <code>-a</code> to also archive the affected entries.</p>
 
 <p><code>doing finish</code> also provides an <code>--auto</code> flag, which you can use to set the end time of any entry to 1 minute before the start time of the next. Running a command such as <code>doing finish --auto 10</code> will go through the last 10 entries and sequentially update any without a <code>@done</code> tag with one set to the time just before the next entry in the list.</p>
 
-<p>As mentioned above, <code>finish</code> also accepts <code>--back "2 hours"</code> (sets the date from time now minus interval) or <code>--took 30m</code> (sets the date from time started plus interval) so you can accurately add times to completed tasks, even if you don't do it in the moment.</p>
+<p>As mentioned above, <code>finish</code> also accepts <code>--back "2 hours"</code> (sets the finish date from time now minus interval) or <code>--took 30m</code> (sets the finish date to time started plus interval) so you can accurately add times to completed tasks, even if you don't do it in the moment.</p>
+
+<h5>
+<a name="tagging-and-autotagging" class="anchor" href="#tagging-and-autotagging"><span class="octicon octicon-link"></span></a>Tagging and Autotagging</h5>
 
 <p><code>tag</code> adds one or more tags to the last entry, or specify a count with <code>-c X</code>. Tags are specified as basic arguments, separated by spaces. For example:</p>
 
 <pre><code>doing tag -c 3 client cancelled
 </code></pre>
 
-<p>... will mark the last three entries as "@client <a href="https://github.com/cancelled" class="user-mention">@cancelled</a>." Add <code>-r</code> as a switch to remove the listed tags instead.</p>
+<p>... will mark the last three entries as "<a href="https://github.com/client" class="user-mention">@client</a> <a href="https://github.com/cancelled" class="user-mention">@cancelled</a>." Add <code>-r</code> as a switch to remove the listed tags instead.</p>
 
-<p><code>note</code> lets you enter a note on the last entry. You can specify a section with <code>-s section_name</code>. <code>-e</code> will open your $EDITOR for typing the note, but you can just include it on the command line after any arguments. You can also pipe a note in on STDIN (<code>echo "fun stuff"|doing note</code>). The <code>-r</code> switch will remove/replace a note; if there's new note text passed when using the <code>-r</code> switch, it will replace any existing note. If the <code>-r</code> switch is used alone, any existing note will be removed.</p>
+<p>You can optionally define keywords for common tasks and projects in your <code>.doingrc</code> file. When these keywords appear in an item title, they'll automatically be converted into <a href="https://github.com/tags" class="user-mention">@tags</a>. The "whitelist" tags are exact (but case insensitive) matches. You can also define "synonyms" which will add a tag at the end based on keywords associated with it.</p>
 
-<p>You can also add notes at the time of entry by using the <code>-n</code> or <code>--note</code> flag with <code>doing now</code>, <code>doing later</code>, or <code>doing done</code>. If you pass in text to any of the creation commands that has multiple lines, everything after the first line break will become the note.</p>
+<p>To add autotagging, include a section like this in your <code>~/.doingrc</code> file:</p>
+
+<pre><code>autotag:
+  whitelist:
+  - doing
+  - mindmeister
+  - marked
+  - playing
+  - working
+  - writing
+  synonyms:
+    playing:
+    - hacking
+    - tweaking
+    - toying
+    - messing
+    writing:
+    - blogging
+    - posting
+    - publishing
+</code></pre>
+
+<h5>
+<a name="annotating" class="anchor" href="#annotating"><span class="octicon octicon-link"></span></a>Annotating</h5>
+
+<p><code>note</code> lets you append a note to the last entry. You can specify a section to grab the last entry from with <code>-s section_name</code>. <code>-e</code> will open your $EDITOR for typing the note, but you can also just include it on the command line after any flags. You can also pipe a note in on STDIN (<code>echo "fun stuff"|doing note</code>). If you don't use the <code>-r</code> switch, new notes will be appended to the existing notes, and using the <code>-e</code> switch will let you edit and add to an existing note. The <code>-r</code> switch will remove/replace a note; if there's new note text passed when using the <code>-r</code> switch, it will replace any existing note. If the <code>-r</code> switch is used alone, any existing note will be removed.</p>
+
+<p>You can also add notes at the time of entry by using the <code>-n</code> or <code>--note</code> flag with <code>doing now</code>, <code>doing later</code>, or <code>doing done</code>. If you pass text to any of the creation commands which has multiple lines, everything after the first line break will become the note.</p>
 
 <h4>
 <a name="displaying-entries" class="anchor" href="#displaying-entries"><span class="octicon octicon-link"></span></a>Displaying entries:</h4>
@@ -387,9 +449,11 @@ grep      - Show entries matching text or pattern
 
 <p>The <code>show</code> command can also show the time spent on a task if it has a <code>@done(date)</code> tag with the <code>-t</code> option. This requires that you include a <code>%interval</code> token in template -&gt; default in the config. You can also include <code>@start(date)</code> tags, which override the timestamp when calculating the intervals.</p>
 
-<p>If you have a use for it, you can use <code>--csv</code> on the show or view commands to output the results as a comma-separated CSV to STDOUT. Redirect to a file to save it: <code>doing show all done --csv &gt; ~/Desktop/done.csv</code>.</p>
+<p>If you have a use for it, you can use <code>-o csv</code> on the show or view commands to output the results as a comma-separated CSV to STDOUT. Redirect to a file to save it: <code>doing show all done -o csv &gt; ~/Desktop/done.csv</code>. You can do the same with <code>-o json</code>.</p>
 
 <p><code>doing yesterday</code> is great for stand-ups, thanks to <a href="https://github.com/sc68cal">Sean Collins</a> for that. Note that you can show yesterday's activity from an alternate section by using the section name as an argument (e.g. <code>doing yesterday archive</code>).</p>
+
+<p><code>doing on</code> allows for full date ranges and filtering. <code>doing on saturday</code>, or <code>doing on one month to today</code> will give you ranges. You can use the same terms with the <code>show</code> command by adding the <code>-f</code> or <code>--from</code> flag. <code>doing show @done --from "monday to friday"</code> will give you all of your completed items for the last week (assuming it's the weekend).</p>
 
 <h4>
 <a name="views" class="anchor" href="#views"><span class="octicon octicon-link"></span></a>Views</h4>
@@ -437,7 +501,7 @@ config   - Edit the default configuration
 
 <p>By default tag archiving uses an "AND" boolean, meaning all the tags listed must exist on the entry for it to be moved. You can change this behavior with <code>-b OR</code> or <code>-b NONE</code> ("ALL" and "ANY" also work). </p>
 
-<p>Example: Archive all Currently items for @client that are marked <a href="https://github.com/done" class="user-mention">@done</a></p>
+<p>Example: Archive all Currently items for <a href="https://github.com/client" class="user-mention">@client</a> that are marked <a href="https://github.com/done" class="user-mention">@done</a></p>
 
 <pre><code>doing archive @client @done
 </code></pre>
@@ -449,6 +513,11 @@ config   - Edit the default configuration
 <a name="bash-completion" class="anchor" href="#bash-completion"><span class="octicon octicon-link"></span></a>Bash completion</h3>
 
 <p>See the file <code>doing.completion.bash</code> in the git repository for full bash completion. Thanks to <a href="https://github.com/fcrespo82">fcrespo82</a> for getting it <a href="https://gist.github.com/fcrespo82/9609318">started</a>.</p>
+
+<h3>
+<a name="zsh-completion" class="anchor" href="#zsh-completion"><span class="octicon octicon-link"></span></a>Zsh completion</h3>
+
+<p>See the file doing.completion.zsh in the git repository for zsh completion.</p>
 
 <h3>
 <a name="launchbar" class="anchor" href="#launchbar"><span class="octicon octicon-link"></span></a>Launchbar</h3>
@@ -511,7 +580,7 @@ ln -s doing /usr/local/bin/
 
 <p>I'm not making any money on <code>doing</code>, and I don't plan to spend a lot of time fixing errors on an array of operating systems and platforms I don't even have access to. You'll probably have to solve some things on your own.</p>
 
-<p>That said, you can get support from other users (and occasionally me) on GitHub. If you run into a replicatable issue in your environment, please <a href="https://github.com/ttscoff/doing/issues">post an issue</a> and include your platform, OS version, and the result of <code>ruby -v</code>, along with a copy/paste of the error message.</p>
+<p>That said, you can get support from other users (and occasionally me) on GitHub. If you run into a replicatable bug in your environment, please <a href="https://github.com/ttscoff/doing/issues">post an issue</a> and include your platform, OS version, and the result of <code>ruby -v</code>, along with a copy/paste of the error message. To get a more verbose error message, try running <code>GLI_DEBUG=true doing [...]</code> for a full trace.</p>
 
 <p>Please try not to email me directly about GitHub projects.</p>
 
@@ -524,6 +593,59 @@ ln -s doing /usr/local/bin/
 <a name="changelog" class="anchor" href="#changelog"><span class="octicon octicon-link"></span></a>Changelog</h3>
 
 <h4>
+<a name="108pre" class="anchor" href="#108pre"><span class="octicon octicon-link"></span></a>1.0.8pre</h4>
+
+<ul>
+<li>JSON output option to view commands</li>
+<li>Added autotagging to tag command</li>
+<li>date filtering, improved date language</li>
+<li>added doing on command</li>
+<li>let view templates define output format (csv, json, html, template)
+
+<ul>
+<li>add %chompnote template variable (item note with newlines and extra whitespace stripped)</li>
+</ul>
+</li>
+</ul><h4>
+<a name="107pre" class="anchor" href="#107pre"><span class="octicon octicon-link"></span></a>1.0.7pre</h4>
+
+<ul>
+<li>fix for -v option</li>
+<li>Slightly fuzzier searching in the grep command</li>
+<li>cleaner exits, only_timed key for view configs</li>
+<li>making the note command append new notes better, and load existing notes in the editor if -e is called</li>
+<li>handle multiple tag input in 'show' tag filter</li>
+<li>Global tag operations, better reporting</li>
+</ul><h4>
+<a name="104pre" class="anchor" href="#104pre"><span class="octicon octicon-link"></span></a>1.0.4pre</h4>
+
+<ul>
+<li>Improved HTML output</li>
+<li>--only_timed option for view/show commands that only outputs items with elapsed timers (interval between start and done dates)</li>
+<li>add seconds for timed items in CSV output, run --only_timed before chopping off --count #</li>
+<li>fix for 1.8.7 Dir.home issue</li>
+<li>version bump</li>
+<li>don't show tag totals with zero times</li>
+<li>zsh completion for doing</li>
+<li>HTML styling</li>
+<li>--only_timed option</li>
+<li>added zsh completion file to README.md</li>
+<li>add zsh completion file</li>
+</ul><h4>
+<a name="103pre" class="anchor" href="#103pre"><span class="octicon octicon-link"></span></a>1.0.3pre</h4>
+
+<ul>
+<li>done command: making --took modify start time if --back isn't specified</li>
+<li>Cleaned up time totals, improved HTML output</li>
+<li>fixes for --back and --took parsing</li>
+<li>Adding more complete terminal reporting to archive command</li>
+</ul><h4>
+<a name="100pre" class="anchor" href="#100pre"><span class="octicon octicon-link"></span></a>1.0.0pre</h4>
+
+<ul>
+<li>Skipped ahead in the version numbering. Because I don't care.</li>
+<li>Added a <code>note</code> command and <code>--note</code> flags for entry creation commands</li>
+</ul><h4>
 <a name="026pre" class="anchor" href="#026pre"><span class="octicon octicon-link"></span></a>0.2.6pre</h4>
 
 <ul>
@@ -695,26 +817,13 @@ ln -s doing /usr/local/bin/
 </ul>
 </li>
 </ul>
-        </section>
-
-        <aside id="sidebar">
-          <a href="https://github.com/ttscoff/doing/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/ttscoff/doing/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
-
-          <p class="repo-owner"><a href="https://github.com/ttscoff/doing"></a> is maintained by <a href="https://github.com/ttscoff">ttscoff</a>.</p>
-
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
     </div>
-
-            <script type="text/javascript">
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
